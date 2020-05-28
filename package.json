@@ -1,0 +1,39 @@
+{
+  "name": "taro-plugin-auto-pages",
+  "version": "0.0.1",
+  "description": "Taro3 的自动生成 pages 配置插件",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "dev": "tsc --watch",
+    "tsc": "tsc"
+  },
+  "files": [
+    "src",
+    "dist",
+    "index.js",
+    "package.json"
+  ],
+  "keywords": [
+    "taro"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeHarlan/taro-plugin-auto-pages"
+  },
+  "bugs": {
+    "url": "https://github.com/LeeHarlan/taro-plugin-auto-pages/issues"
+  },
+  "homepage": "https://github.com/LeeHarlan/taro-plugin-auto-pages#readme",
+  "author": "下一个雨季~ <709886167@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^7.1.6"
+  },
+  "devDependencies": {
+    "@tarojs/service": "^2.2.6",
+    "@types/glob": "^7.1.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.6.5"
+  }
+}
