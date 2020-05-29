@@ -24,7 +24,7 @@ const buildTempPages = (sourcePath: string, chalk: any) => {
   const pages = getPageFiles(sourcePath);
   const tpl = `module.exports = ${JSON.stringify(pages, null, 2)};`;
   fs.writeFileSync(pagesFileName, tpl);
-  console.log(`\n${chalk.blue('生成')}  配置文件  ${pagesFileName}`);
+  console.log(`${chalk.blue('生成')}  配置文件  ${pagesFileName}`);
 }
 
 const checkPage = (path: string) => {
@@ -44,7 +44,7 @@ const watchPagesPath = (sourcePath: string, chalk: any) => {
       default:
     }
     if(type){
-      console.log(`\n${chalk.blue(type === 'add' ? '添加' : '删除')}  page  ${winPath(path)}`);
+      console.log(`${chalk.blue(type === 'add' ? '添加' : '删除')}  page  ${winPath(path)}`);
       buildTempPages(sourcePath, chalk);
     }
   });
@@ -63,6 +63,8 @@ export default (ctx: IPluginContext) => {
     if(!fs.existsSync(tmpPath)){
       fs.mkdirSync(tmpPath);
     }
+
+    buildTempPages(sourcePath, chalk);
 
     closeWatch = watchPagesPath(sourcePath, chalk);
   });
