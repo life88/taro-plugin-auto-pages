@@ -48,6 +48,7 @@ export default (ctx: IPluginContext) => {
   const sourcePath = winPath(ctx.paths.sourcePath);
   const chalk = ctx.helper.chalk;
   const appJsonFileName = 'app.json';
+  let closeWatch: () => Promise<void>;
 
   ctx.onBuildStart(() => {
     const tmpPath = `${sourcePath}/.temp`;
@@ -55,7 +56,7 @@ export default (ctx: IPluginContext) => {
       fs.mkdirSync(tmpPath);
     }
 
-    watchPagesPath(sourcePath, chalk);
+    closeWatch = watchPagesPath(sourcePath, chalk);
   });
 
   ctx.modifyBuildAssets((args: any) => {
@@ -69,4 +70,8 @@ export default (ctx: IPluginContext) => {
       return JSON.stringify(appJson);
     };
   });
+
+  ctx.onBuildFinish(() => {
+    closeWatch && closeWatch();
+  })
 };
