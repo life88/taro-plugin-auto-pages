@@ -4,6 +4,7 @@
   "description": "Taro3 的自动生成 pages 配置插件",
   "main": "index.js",
   "scripts": {
+    "postinstall": "npm run build",
     "build": "rimraf dist && tsc",
     "dev": "tsc --watch",
     "tsc": "tsc"
