@@ -1,6 +1,6 @@
 {
   "name": "taro-plugin-auto-pages",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Taro3 的自动生成 pages 配置插件",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,6 @@
   "author": "下一个雨季~ <709886167@qq.com>",
   "license": "MIT",
   "dependencies": {
-    "chokidar": "^3.4.0",
     "glob": "^7.1.6"
   },
   "devDependencies": {

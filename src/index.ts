@@ -1,6 +1,5 @@
 import fs from 'fs';
 import glob from 'glob';
-import chokidar from 'chokidar';
 import {IPluginContext} from '@tarojs/service';
 import winPath from "./utils/winPath";
 
@@ -31,8 +30,8 @@ const checkPage = (path: string) => {
   return /(.*)\/index\.(vue|tsx?|jsx?)$/.test(winPath(path));
 }
 
-const watchPagesPath = (sourcePath: string, chalk: any) => {
-  const watch = chokidar.watch(`${sourcePath}/pages/`).on('all', (event, path) => {
+const watchPagesPath = ({ chokidar, chalk, sourcePath } : {  chokidar: any, chalk: any, sourcePath: string }) => {
+  const watcher = chokidar.watch(`${sourcePath}/pages/`, { ignoreInitial: true }).on('all', (event: any, path: string) => {
     let type;
     switch(event){
       case "add":
@@ -49,14 +48,15 @@ const watchPagesPath = (sourcePath: string, chalk: any) => {
     }
   });
 
-  return () => watch.close();
+  process.once('SIGINT', async () => {
+    await watcher.close()
+  })
 }
 
 export default (ctx: IPluginContext) => {
   const sourcePath = winPath(ctx.paths.sourcePath);
-  const chalk = ctx.helper.chalk;
+  const { chalk, chokidar } = ctx.helper;
   const appJsonFileName = 'app.json';
-  let closeWatch: () => Promise<void>;
 
   ctx.onBuildStart(() => {
     const tmpPath = `${sourcePath}/.temp`;
@@ -65,8 +65,7 @@ export default (ctx: IPluginContext) => {
     }
 
     buildTempPages(sourcePath, chalk);
-
-    closeWatch = watchPagesPath(sourcePath, chalk);
+    watchPagesPath({ chokidar, chalk, sourcePath });
   });
 
   ctx.modifyBuildAssets((args: any) => {
@@ -83,7 +82,7 @@ export default (ctx: IPluginContext) => {
 
   ctx.onBuildFinish(() => {
     if(process.env.NODE_ENV === 'production'){
-      closeWatch && closeWatch();
+      process.exit(0);
     }
   })
 };

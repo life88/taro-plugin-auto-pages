@@ -1186,21 +1186,6 @@ chokidar@3.3.1:
   optionalDependencies:
     fsevents "~2.1.2"
 
-chokidar@^3.4.0:
-  version "3.4.0"
-  resolved "https://r.cnpmjs.org/chokidar/download/chokidar-3.4.0.tgz#b30611423ce376357c765b9b8f904b9fba3c0be8"
-  integrity sha1-swYRQjzjdjV8dlubj5BLn7o8C+g=
-  dependencies:
-    anymatch "~3.1.1"
-    braces "~3.0.2"
-    glob-parent "~5.1.0"
-    is-binary-path "~2.1.0"
-    is-glob "~4.0.1"
-    normalize-path "~3.0.0"
-    readdirp "~3.4.0"
-  optionalDependencies:
-    fsevents "~2.1.2"
-
 class-utils@^0.3.5:
   version "0.3.6"
   resolved "https://registry.npm.taobao.org/class-utils/download/class-utils-0.3.6.tgz#f93369ae8b9a7ce02fd41faad0ca83033190c463"
@@ -2037,7 +2022,7 @@ pend@~1.2.0:
   resolved "https://registry.npm.taobao.org/pend/download/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-picomatch@^2.0.4, picomatch@^2.0.7, picomatch@^2.2.1:
+picomatch@^2.0.4, picomatch@^2.0.7:
   version "2.2.2"
   resolved "https://registry.npm.taobao.org/picomatch/download/picomatch-2.2.2.tgz#21f333e9b6b8eaff02468f5146ea406d345f4dad"
   integrity sha1-IfMz6ba46v8CRo9RRupAbTRfTa0=
@@ -2084,13 +2069,6 @@ readdirp@~3.3.0:
   integrity sha1-mERY0ToeQuLp9YQbEp4WLzaa/xc=
   dependencies:
     picomatch "^2.0.7"
-
-readdirp@~3.4.0:
-  version "3.4.0"
-  resolved "https://r.cnpmjs.org/readdirp/download/readdirp-3.4.0.tgz#9fdccdf9e9155805449221ac645e8303ab5b9ada"
-  integrity sha1-n9zN+ekVWAVEkiGsZF6DA6tbmto=
-  dependencies:
-    picomatch "^2.2.1"
 
 regenerate-unicode-properties@^8.2.0:
   version "8.2.0"
