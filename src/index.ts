@@ -4,11 +4,17 @@ import chokidar from 'chokidar';
 import {IPluginContext} from '@tarojs/service';
 import winPath from "./utils/winPath";
 
+const INDEX_PAGE = 'pages/index/index';
+
 const getPageFiles = (sourcePath: string) => {
   const files = glob.sync(`${sourcePath}/**/index.?(vue|js?(x)|ts?(x))`);
-  return (files || []).map((file: any) => {
+  const pages = (files || []).map((file: any) => {
     return file.replace(`${sourcePath}/`, '').replace(/index\.(vue|tsx?|jsx?)$/, 'index');
   });
+  const idx = pages.indexOf(INDEX_PAGE);
+  pages.splice(idx, 1);
+  pages.unshift(INDEX_PAGE);
+  return pages;
 }
 
 const buildTempPages = (sourcePath: string, chalk: any) => {
