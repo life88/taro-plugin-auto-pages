@@ -12,8 +12,10 @@ const getPageFiles = (sourcePath: string) => {
     return file.replace(`${sourcePath}/`, '').replace(/index\.(vue|tsx?|jsx?)$/, 'index');
   });
   const idx = pages.indexOf(INDEX_PAGE);
-  pages.splice(idx, 1);
-  pages.unshift(INDEX_PAGE);
+  if(idx > -1){
+    pages.splice(idx, 1);
+    pages.unshift(INDEX_PAGE);
+  }
   return pages;
 }
 
@@ -22,7 +24,7 @@ const buildTempPages = (sourcePath: string, chalk: any) => {
   const pages = getPageFiles(sourcePath);
   const tpl = `module.exports = ${JSON.stringify(pages, null, 2)};`;
   fs.writeFileSync(pagesFileName, tpl);
-  console.log(`${chalk.blue('生成')}  配置文件  ${pagesFileName}`);
+  console.log(`\n${chalk.blue('生成')}  配置文件  ${pagesFileName}`);
 }
 
 const checkPage = (path: string) => {
@@ -42,7 +44,7 @@ const watchPagesPath = (sourcePath: string, chalk: any) => {
       default:
     }
     if(type){
-      console.log(`${chalk.blue(type === 'add' ? '添加' : '删除')}  page  ${winPath(path)}`);
+      console.log(`\n${chalk.blue(type === 'add' ? '添加' : '删除')}  page  ${winPath(path)}`);
       buildTempPages(sourcePath, chalk);
     }
   });
@@ -78,6 +80,8 @@ export default (ctx: IPluginContext) => {
   });
 
   ctx.onBuildFinish(() => {
-    closeWatch && closeWatch();
+    if(process.env.NODE_ENV === 'production'){
+      closeWatch && closeWatch();
+    }
   })
 };
