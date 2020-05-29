@@ -36,7 +36,7 @@ const watchPagesPath = (sourcePath: string, chalk: any) => {
       default:
     }
     if(type){
-      console.log(`${chalk.blue(type)}  page  ${winPath(path)}`);
+      console.log(`${chalk.blue(type === 'add' ? '添加' : '删除')}  page  ${winPath(path)}`);
       buildTempPages(sourcePath, chalk);
     }
   });
