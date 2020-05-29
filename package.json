@@ -1,6 +1,6 @@
 {
   "name": "taro-plugin-auto-pages",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Taro3 的自动生成 pages 配置插件",
   "main": "index.js",
   "scripts": {
