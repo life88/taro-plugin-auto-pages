@@ -28,6 +28,7 @@
   "author": "下一个雨季~ <709886167@qq.com>",
   "license": "MIT",
   "dependencies": {
+    "chokidar": "^3.4.0",
     "glob": "^7.1.6"
   },
   "devDependencies": {
