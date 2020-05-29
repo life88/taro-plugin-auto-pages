@@ -65,7 +65,10 @@ export default (ctx: IPluginContext) => {
     }
 
     buildTempPages(sourcePath, chalk);
-    watchPagesPath({ chokidar, chalk, sourcePath });
+
+    if(process.env.NODE_ENV !== 'production'){
+      watchPagesPath({ chokidar, chalk, sourcePath });
+    }
   });
 
   ctx.modifyBuildAssets((args: any) => {
@@ -79,10 +82,4 @@ export default (ctx: IPluginContext) => {
       return JSON.stringify(appJson);
     };
   });
-
-  ctx.onBuildFinish(() => {
-    if(process.env.NODE_ENV === 'production'){
-      process.exit(0);
-    }
-  })
 };
