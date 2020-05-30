@@ -6,7 +6,7 @@ import winPath from "./utils/winPath";
 const INDEX_PAGE = 'pages/index/index';
 
 const getPageFiles = (sourcePath: string) => {
-  const files = glob.sync(`${sourcePath}/**/index.?(vue|js?(x)|ts?(x))`);
+  const files = glob.sync(`${sourcePath}/pages/**/index.?(vue|js?(x)|ts?(x))`);
   const pages = (files || []).map((file: any) => {
     return file.replace(`${sourcePath}/`, '').replace(/index\.(vue|tsx?|jsx?)$/, 'index');
   });
