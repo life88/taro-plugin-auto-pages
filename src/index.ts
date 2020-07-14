@@ -54,6 +54,12 @@ const watchPagesPath = ({ chokidar, chalk, sourcePath } : {  chokidar: any, chal
 }
 
 export default (ctx: IPluginContext) => {
+
+  // @ts-ignore
+  if(ctx.runOpts.platform === 'h5'){
+    return;
+  }
+
   const sourcePath = winPath(ctx.paths.sourcePath);
   const { chalk, chokidar } = ctx.helper;
   const appJsonFileName = 'app.json';
