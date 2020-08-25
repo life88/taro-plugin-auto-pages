@@ -1,91 +1,117 @@
-import fs from 'fs';
+import * as fs from "fs";
 import glob from 'glob';
-import {IPluginContext} from '@tarojs/service';
-import winPath from "./utils/winPath";
+import winPath from './utils/winPath';
 
 const INDEX_PAGE = 'pages/index/index';
 
-const getPageFiles = (sourcePath: string) => {
-  const files = glob.sync(`${sourcePath}/pages/**/index.?(vue|js?(x)|ts?(x))`);
-  const pages = (files || []).map((file: any) => {
-    return file.replace(`${sourcePath}/`, '').replace(/index\.(vue|tsx?|jsx?)$/, 'index');
-  });
-  const idx = pages.indexOf(INDEX_PAGE);
-  if(idx > -1){
-    pages.splice(idx, 1);
-    pages.unshift(INDEX_PAGE);
-  }
-  return pages;
+interface IPluginOptions {
+  indexPath: string,
 }
 
-const buildTempPages = (sourcePath: string, chalk: any) => {
-  const pagesFileName = `${sourcePath}/.temp/pages.js`;
-  const pages = getPageFiles(sourcePath);
-  const tpl = `module.exports = ${JSON.stringify(pages, null, 2)};`;
-  fs.writeFileSync(pagesFileName, tpl);
-  console.log(`${chalk.blue('生成')}  配置文件  ${pagesFileName}`);
+interface IOptions {
+  ctx: any,
+  indexPath: string,
 }
 
-const checkPage = (path: string) => {
-  return /(.*)\/index\.(vue|tsx?|jsx?)$/.test(winPath(path));
-}
+class TaroPluginAutoPage {
+  static readonly pluginName: string = 'TaroPluginAutoPage';
+  private ctx: any;
+  private indexPath: string;
+  private appJsonFileName: string;
+  private sourcePath: string;
+  private chalk: any;
+  private chokidar: any;
 
-const watchPagesPath = ({ chokidar, chalk, sourcePath } : {  chokidar: any, chalk: any, sourcePath: string }) => {
-  const watcher = chokidar.watch(`${sourcePath}/pages/`, { ignoreInitial: true }).on('all', (event: any, path: string) => {
-    let type;
-    switch(event){
-      case "add":
-      case "unlink":
-        if(checkPage(path)){
-          type = event;
-        }
-        break;
-      default:
-    }
-    if(type){
-      console.log(`${chalk.blue(type === 'add' ? '添加' : '删除')}  发现页面  ${winPath(path)}`);
-      buildTempPages(sourcePath, chalk);
-    }
-  });
-
-  process.once('SIGINT', async () => {
-    await watcher.close()
-  })
-}
-
-export default (ctx: IPluginContext) => {
-
-  // @ts-ignore
-  if(ctx.runOpts.platform === 'h5'){
-    return;
+  constructor(props: IOptions) {
+    const {ctx, indexPath = INDEX_PAGE} = props;
+    const {chalk, chokidar} = ctx.helper;
+    this.ctx = ctx;
+    this.indexPath = indexPath;
+    this.appJsonFileName = 'app.json';
+    this.sourcePath = winPath(ctx.paths.sourcePath);
+    this.chalk = chalk;
+    this.chokidar = chokidar;
   }
 
-  const sourcePath = winPath(ctx.paths.sourcePath);
-  const { chalk, chokidar } = ctx.helper;
-  const appJsonFileName = 'app.json';
+  checkPage(path: string) {
+    return /(.*)\/index\.(vue|tsx?|jsx?)$/.test(winPath(path));
+  }
 
-  ctx.onBuildStart(() => {
-    const tmpPath = `${sourcePath}/.temp`;
-    if(!fs.existsSync(tmpPath)){
-      fs.mkdirSync(tmpPath);
+  getPageFiles() {
+    const files = glob.sync(`${this.sourcePath}/pages/**/index.?(vue|js?(x)|ts?(x))`);
+    const pages = (files || []).map((file: string) => {
+      return file.replace(`${this.sourcePath}/`, '').replace(/index\.(vue|tsx?|jsx?)$/, 'index');
+    });
+    const idx = pages.indexOf(this.indexPath);
+    if (idx > -1) {
+      pages.splice(idx, 1);
+      pages.unshift(this.indexPath);
+    } else {
+      console.log(`${this.chalk.yellow(`${TaroPluginAutoPage.pluginName} 插件[indexPath]参数配置无效[${this.indexPath}]`)}`)
     }
+    return pages;
+  }
 
-    buildTempPages(sourcePath, chalk);
+  buildTempPages() {
+    const pagesFileName = `${this.sourcePath}/.temp/pages.js`;
+    const pages = this.getPageFiles();
+    const tpl = `module.exports = ${JSON.stringify(pages, null, 2)};`;
+    fs.writeFileSync(pagesFileName, tpl);
+    console.log(`${this.chalk.blue('生成')}  配置文件  ${pagesFileName}`);
+  }
 
-    if(process.env.NODE_ENV !== 'production'){
-      watchPagesPath({ chokidar, chalk, sourcePath });
-    }
-  });
+  watchPagesPath() {
+    const watcher = this.chokidar.watch(`${this.sourcePath}/pages/`, {ignoreInitial: true}).on('all', (event: string, path: string) => {
+      let type;
+      switch (event) {
+        case "add":
+        case "unlink":
+          if (this.checkPage(path)) {
+            type = event;
+          }
+          break;
+        default:
+      }
+      if (type) {
+        console.log(`${this.chalk.blue(type === 'add' ? '添加' : '删除')}  发现页面  ${winPath(path)}`);
+        this.buildTempPages();
+      }
+    });
 
-  ctx.modifyBuildAssets((args: any) => {
-    const appSource = args.assets[appJsonFileName].source();
-    const pages = getPageFiles(sourcePath);
+    process.once('SIGINT', async () => {
+      await watcher.close()
+    })
+  }
 
-    const appJson = JSON.parse(appSource);
-    appJson.pages = pages;
+  install() {
+    this.ctx.onBuildStart(() => {
+      const tmpPath = `${this.sourcePath}/.temp`;
+      if (!fs.existsSync(tmpPath)) {
+        fs.mkdirSync(tmpPath);
+      }
 
-    args.assets[appJsonFileName].source = () => {
-      return JSON.stringify(appJson);
-    };
-  });
-};
+      this.buildTempPages();
+
+      if (process.env.NODE_ENV !== 'production') {
+        this.watchPagesPath();
+      }
+    })
+
+    this.ctx.modifyBuildAssets((args: any) => {
+      const appSource = args.assets[this.appJsonFileName].source();
+      const pages = this.getPageFiles();
+
+      const appJson = JSON.parse(appSource);
+      appJson.pages = pages;
+
+      args.assets[this.appJsonFileName].source = () => {
+        return JSON.stringify(appJson);
+      };
+    })
+  }
+}
+
+export default function (ctx: any, ops: IPluginOptions) {
+  const plugin = new TaroPluginAutoPage({ctx, ...ops});
+  plugin.install();
+}
