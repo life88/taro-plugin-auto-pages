@@ -84,8 +84,6 @@ class TaroPluginAutoPage {
   }
 
   install() {
-    if(this.ctx.runOpts.platform === 'h5') return;
-
     this.ctx.onBuildStart(() => {
       const tmpPath = `${this.sourcePath}/.temp`;
       if (!fs.existsSync(tmpPath)) {
@@ -100,6 +98,8 @@ class TaroPluginAutoPage {
     })
 
     this.ctx.modifyBuildAssets((args: any) => {
+      if(this.ctx.runOpts.platform === 'h5') return;
+
       const appSource = args.assets[this.appJsonFileName].source();
       const pages = this.getPageFiles();
 
