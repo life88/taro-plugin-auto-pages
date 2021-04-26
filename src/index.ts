@@ -98,7 +98,8 @@ class TaroPluginAutoPage {
     })
 
     this.ctx.modifyBuildAssets((args: any) => {
-      if(this.ctx.runOpts.platform === 'h5') return;
+      const platform = this.ctx.runOpts.platform || this.ctx.runOpts.options?.platform;
+      if(platform === 'h5') return;
 
       const appSource = args.assets[this.appJsonFileName].source();
       const pages = this.getPageFiles();
